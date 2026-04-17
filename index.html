@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Casino Golf">
+  <meta name="theme-color" content="#1a1a1a">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="manifest" href="manifest.json">
+  <title>Casino Golf</title>
+  <style>
+    :root {
+      --bg: #111;
+      --bg2: #1c1c1e;
+      --bg3: #2c2c2e;
+      --bg4: #3a3a3c;
+      --text: #fff;
+      --text2: rgba(255,255,255,0.6);
+      --text3: rgba(255,255,255,0.35);
+      --green: #30d158;
+      --green-bg: rgba(48,209,88,0.15);
+      --red: #ff453a;
+      --red-bg: rgba(255,69,58,0.15);
+      --amber: #ffd60a;
+      --amber-bg: rgba(255,214,10,0.12);
+      --blue: #0a84ff;
+      --blue-bg: rgba(10,132,255,0.15);
+      --border: rgba(255,255,255,0.1);
+      --radius: 14px;
+      --radius-sm: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; overflow: hidden; }
+
+    .screen { display: none; flex-direction: column; height: 100vh; height: 100dvh; }
+    .screen.active { display: flex; }
+
+    /* NAV BAR */
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: env(safe-area-inset-top, 44px) 20px 12px; background: rgba(17,17,17,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
+    .nav-title { font-size: 17px; font-weight: 600; }
+    .nav-btn { font-size: 16px; color: var(--blue); background: none; border: none; cursor: pointer; padding: 4px 0; min-width: 44px; }
+    .nav-btn.right { text-align: right; }
+    .nav-btn.left { text-align: left; }
+
+    /* SCROLL BODY */
+    .scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 16px; padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 80px); }
+
+    /* BOTTOM TAB BAR */
+    .tab-bar { display: flex; background: rgba(17,17,17,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 0.5px solid var(--border); padding-bottom: env(safe-area-inset-bottom, 0px); flex-shrink: 0; }
+    .tab { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 3px; background: none; border: none; cursor: pointer; color: var(--text3); }
+    .tab.active { color: var(--blue); }
+    .tab-icon { font-size: 22px; }
+    .tab-label { font-size: 10px; font-weight: 500; }
+
+    /* CARDS */
+    .card { background: var(--bg2); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; border: 0.5px solid var(--border); }
+    .card-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px; }
+
+    /* FORM */
+    .field { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+    .field:last-child { border-bottom: none; }
+    .field-label { font-size: 16px; color: var(--text); flex: 1; }
+    .field input, .field select { background: var(--bg3); border: none; border-radius: 8px; color: var(--text); font-size: 16px; padding: 7px 12px; text-align: right; outline: none; }
+    .field input { width: 140px; }
+    .field select { -webkit-appearance: none; }
+
+    /* PLAYER CHIPS */
+    .avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .av0 { background: rgba(94,92,230,0.25); color: #7c7aff; }
+    .av1 { background: rgba(48,209,88,0.2); color: #30d158; }
+    .av2 { background: rgba(255,159,10,0.2); color: #ff9f0a; }
+    .av3 { background: rgba(255,69,58,0.2); color: #ff453a; }
+
+    /* BUTTONS */
+    .btn { width: 100%; padding: 15px; border-radius: var(--radius); font-size: 17px; font-weight: 600; border: none; cursor: pointer; margin-bottom: 10px; }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-secondary { background: var(--bg3); color: var(--text); }
+    .btn-green { background: var(--green); color: #000; }
+    .btn-danger { background: var(--red-bg); color: var(--red); }
+
+    /* BIG STAT */
+    .big-stat { text-align: center; padding: 8px 0 16px; }
+    .big-num { font-size: 48px; font-weight: 700; letter-spacing: -1px; }
+    .big-label { font-size: 14px; color: var(--text2); margin-top: 2px; }
+
+    /* PLAYER STATS ROW */
+    .player-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .pstat { background: var(--bg2); border-radius: var(--radius-sm); padding: 12px; border: 0.5px solid var(--border); }
+    .pstat-name { font-size: 12px; color: var(--text2); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pstat-val { font-size: 20px; font-weight: 600; }
+    .pstat-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+    /* PUTT LOGGER */
+    .putt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .putt-player { background: var(--bg2); border-radius: var(--radius-sm); padding: 14px; border: 0.5px solid var(--border); }
+    .putt-name { font-size: 13px; color: var(--text2); margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .putt-btns { display: flex; gap: 6px; }
+    .pb { flex: 1; padding: 10px 0; border-radius: 8px; border: none; font-size: 18px; font-weight: 600; cursor: pointer; background: var(--bg3); color: var(--text2); transition: all 0.12s; }
+    .pb.p1 { background: var(--green-bg); color: var(--green); }
+    .pb.p2 { background: var(--bg3); color: var(--text2); }
+    .pb.p3 { background: var(--red-bg); color: var(--red); }
+    .pb.active { transform: scale(0.95); }
+
+    /* PROGRESS BAR */
+    .progress-wrap { background: var(--bg3); border-radius: 4px; height: 4px; margin-bottom: 16px; overflow: hidden; }
+    .progress-bar { height: 4px; background: var(--blue); border-radius: 4px; transition: width 0.3s; }
+
+    /* POKER CARDS */
+    .playing-card { width: 48px; height: 66px; border-radius: 9px; border: 1px solid var(--border); background: var(--bg2); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; cursor: pointer; transition: transform 0.12s, opacity 0.12s; user-select: none; flex-shrink: 0; }
+    .playing-card.red { color: #ff453a; }
+    .playing-card.black { color: #fff; }
+    .playing-card.discarded { opacity: 0.2; transform: translateY(6px) scale(0.93); border-style: dashed; }
+    .playing-card.community { cursor: default; background: var(--bg3); }
+    .playing-card.hidden-card { background: var(--bg3); color: var(--text3); font-size: 20px; cursor: default; }
+    .hand-row { display: flex; gap: 8px; flex-wrap: wrap; padding: 4px 0 8px; }
+
+    /* BADGE */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-green { background: var(--green-bg); color: var(--green); }
+    .badge-amber { background: var(--amber-bg); color: var(--amber); }
+    .badge-blue { background: var(--blue-bg); color: var(--blue); }
+    .badge-red { background: var(--red-bg); color: var(--red); }
+
+    /* WINNER */
+    .winner-card { background: var(--green-bg); border: 1px solid var(--green); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+    .winner-name { font-size: 22px; font-weight: 700; color: var(--green); }
+    .winner-sub { font-size: 14px; color: var(--text2); margin-top: 4px; }
+
+    /* POKER PHASE STEPS */
+    .phase-steps { display: flex; gap: 0; margin-bottom: 20px; }
+    .phase-step { flex: 1; text-align: center; font-size: 11px; font-weight: 600; padding: 7px 4px; color: var(--text3); border-bottom: 2px solid var(--bg3); }
+    .phase-step.done { color: var(--text2); border-bottom-color: var(--bg4); }
+    .phase-step.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+    /* SEPARATOR */
+    .sep { height: 0.5px; background: var(--border); margin: 12px 0; }
+
+    /* HINT */
+    .hint { font-size: 13px; color: var(--text3); margin-bottom: 10px; line-height: 1.4; }
+
+    /* HOLE NAV */
+    .hole-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .hole-nav-btn { background: var(--bg3); border: none; color: var(--text); font-size: 20px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .hole-nav-btn:disabled { opacity: 0.3; }
+    .hole-info { text-align: center; }
+    .hole-big { font-size: 28px; font-weight: 700; }
+    .hole-sub { font-size: 13px; color: var(--text2); }
+
+    /* POT HEADER */
+    .pot-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg2); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; border: 0.5px solid var(--border); }
+    .pot-section { text-align: center; }
+    .pot-section:first-child { text-align: left; }
+    .pot-section:last-child { text-align: right; }
+    .pot-val { font-size: 22px; font-weight: 700; }
+    .pot-lbl { font-size: 11px; color: var(--text2); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+  </style>
+</head>
+<body>
+
+<!-- ===================== SETUP SCREEN ===================== -->
+<div class="screen active" id="screen-setup">
+  <div class="nav">
+    <span style="min-width:44px;"></span>
+    <span class="nav-title">Casino Golf</span>
+    <button class="nav-btn right" onclick="startGame()">Start</button>
+  </div>
+  <div class="scroll">
+    <div class="card">
+      <div class="card-title">Players</div>
+      <div class="field"><div class="avatar av0" id="av0">P1</div><input id="n0" value="Player 1" oninput="updateAv(0)" placeholder="Name"></div>
+      <div class="field"><div class="avatar av1" id="av1">P2</div><input id="n1" value="Player 2" oninput="updateAv(1)" placeholder="Name"></div>
+      <div class="field"><div class="avatar av2" id="av2">P3</div><input id="n2" value="Player 3" oninput="updateAv(2)" placeholder="Name"></div>
+      <div class="field"><div class="avatar av3" id="av3">P4</div><input id="n3" value="Player 4" oninput="updateAv(3)" placeholder="Name"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Game settings</div>
+      <div class="field">
+        <span class="field-label">Buy-in</span>
+        <select id="buyin">
+          <option value="500">500 ISK</option>
+          <option value="1000">1000 ISK</option>
+          <option value="5eur">5 EUR</option>
+        </select>
+      </div>
+      <div class="field">
+        <span class="field-label">3-putt penalty</span>
+        <select id="penalty">
+          <option value="500">500 ISK</option>
+          <option value="1000">1000 ISK</option>
+        </select>
+      </div>
+      <div class="field">
+        <span class="field-label">Holes</span>
+        <select id="holecount">
+          <option value="9">9 holes</option>
+          <option value="18" selected>18 holes</option>
+        </select>
+      </div>
+    </div>
+    <div style="background:rgba(10,132,255,0.08);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;border:0.5px solid rgba(10,132,255,0.25);">
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;">
+        <b style="color:rgba(255,255,255,0.8);">How to play</b><br>
+        Everyone starts with 2 cards. A <span style="color:#30d158;">1-putt</span> earns you a new card. A <span style="color:#ff453a;">3-putt</span> adds to the pot. After the round, play a poker hand — best 5-card hand wins the pot.
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="startGame()">Start game</button>
+  </div>
+</div>
+
+<!-- ===================== ROUND SCREEN ===================== -->
+<div class="screen" id="screen-round">
+  <div class="nav">
+    <button class="nav-btn left" onclick="confirmReset()">Reset</button>
+    <span class="nav-title" id="round-title">Round</span>
+    <button class="nav-btn right" onclick="goPoker()">Poker →</button>
+  </div>
+  <div class="scroll">
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="pot-header">
+      <div class="pot-section"><div class="pot-lbl">Pot</div><div class="pot-val" id="r-pot">0</div></div>
+      <div class="pot-section"><div class="pot-lbl">Hole</div><div class="pot-val" id="r-hole">1</div></div>
+      <div class="pot-section"><div class="pot-lbl">Cards</div><div id="r-cards" style="font-size:12px;color:var(--text2);text-align:right;margin-top:2px;"></div></div>
+    </div>
+    <div class="hole-nav">
+      <button class="hole-nav-btn" id="prev-btn" onclick="prevHole()" disabled>‹</button>
+      <div class="hole-info">
+        <div class="hole-big">Hole <span id="hole-num">1</span></div>
+        <div class="hole-sub">Tap each player's putt count</div>
+      </div>
+      <button class="hole-nav-btn" id="next-btn" onclick="nextHole()">›</button>
+    </div>
+    <div class="putt-grid" id="putt-grid"></div>
+    <div class="sep"></div>
+    <div class="card-title" style="margin-bottom:8px;">Card hands</div>
+    <div class="player-stats" id="player-stats"></div>
+  </div>
+</div>
+
+<!-- ===================== POKER SCREEN ===================== -->
+<div class="screen" id="screen-poker">
+  <div class="nav">
+    <button class="nav-btn left" onclick="showScreen('round')">← Round</button>
+    <span class="nav-title">Poker hand</span>
+    <span style="min-width:44px;"></span>
+  </div>
+  <div class="scroll" id="poker-scroll">
+    <!-- rendered by JS -->
+  </div>
+</div>
+
+<script>
+const SUITS = ['♠','♥','♦','♣'];
+const RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const RED = new Set(['♥','♦']);
+const RANK_VAL = Object.fromEntries(RANKS.map((r,i)=>[r,i+2]));
+
+let G = {};
+
+function initG() {
+  G = {
+    players: ['Player 1','Player 2','Player 3','Player 4'],
+    buyin: 500,
+    buyin_label: '500 ISK',
+    penalty: 500,
+    holes: 18,
+    pot: 0,
+    hole: 1,
+    putts: [],
+    hands: [[],[],[],[]],
+    community: [],
+    discarded: [[],[],[],[]],
+    pokerPhase: 'preflop',
+    deck: []
+  };
+}
+
+function saveState() {
+  try { localStorage.setItem('cg_state', JSON.stringify(G)); } catch(e) {}
+}
+function loadState() {
+  try {
+    const s = localStorage.getItem('cg_state');
+    if (s) { G = JSON.parse(s); return true; }
+  } catch(e) {}
+  return false;
+}
+
+function updateAv(i) {
+  const v = document.getElementById('n'+i).value;
+  document.getElementById('av'+i).textContent = (v.slice(0,2)||'P'+(i+1)).toUpperCase();
+}
+
+function fmt(v) {
+  if (typeof v === 'string') return v;
+  return v.toLocaleString() + ' ISK';
+}
+
+function buildDeck() {
+  G.deck = [];
+  for (let s of SUITS) for (let r of RANKS) G.deck.push({r,s});
+  for (let i=G.deck.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [G.deck[i],G.deck[j]]=[G.deck[j],G.deck[i]];
+  }
+}
+function draw() { return G.deck.length ? G.deck.pop() : {r:'?',s:'?'}; }
+
+function startGame() {
+  initG();
+  G.players = [0,1,2,3].map(i => document.getElementById('n'+i).value.trim() || 'Player '+(i+1));
+  const b = document.getElementById('buyin').value;
+  G.penalty = parseInt(document.getElementById('penalty').value);
+  G.holes = parseInt(document.getElementById('holecount').value);
+  if (b === '5eur') { G.buyin_label = '5 EUR'; G.pot = '20 EUR'; }
+  else { G.buyin = parseInt(b); G.buyin_label = b+' ISK'; G.pot = parseInt(b)*4; }
+  G.putts = Array.from({length: G.holes}, () => [2,2,2,2]);
+  buildDeck();
+  for (let p=0;p<4;p++) G.hands[p] = [draw(), draw()];
+  saveState();
+  renderRound();
+  showScreen('round');
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+}
+
+function renderRound() {
+  document.getElementById('round-title').textContent = `Hole ${G.hole} of ${G.holes}`;
+  document.getElementById('r-pot').textContent = fmt(G.pot);
+  document.getElementById('r-hole').textContent = `${G.hole}/${G.holes}`;
+  document.getElementById('hole-num').textContent = G.hole;
+  document.getElementById('progress-bar').style.width = ((G.hole-1)/G.holes*100)+'%';
+  document.getElementById('prev-btn').disabled = G.hole <= 1;
+  document.getElementById('next-btn').textContent = G.hole >= G.holes ? '→' : '›';
+
+  // Cards summary
+  const cardsEl = document.getElementById('r-cards');
+  cardsEl.innerHTML = G.players.map((n,i)=>`${n.split(' ')[0]}: ${G.hands[i].length}`).join('<br>');
+
+  // Putt grid
+  const pg = document.getElementById('putt-grid');
+  pg.innerHTML = G.players.map((name,pi) => {
+    const cur = G.putts[G.hole-1][pi];
+    return `<div class="putt-player">
+      <div class="putt-name">${name}</div>
+      <div class="putt-btns">
+        ${[1,2,3].map(n=>`<button class="pb ${n===cur?'p'+n:''}" onclick="setPutt(${pi},${n})">${n}</button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Stats
+  const ps = document.getElementById('player-stats');
+  ps.innerHTML = G.players.map((name,i) => {
+    const ones = G.putts.slice(0,G.hole).filter((h,hi)=>hi<G.hole && h[i]===1).length;
+    const threes = G.putts.slice(0,G.hole).filter((h,hi)=>hi<G.hole && h[i]===3).length;
+    return `<div class="pstat">
+      <div class="pstat-name">${name}</div>
+      <div class="pstat-val">${G.hands[i].length} cards</div>
+      <div class="pstat-sub">1-putts: ${ones} &nbsp;·&nbsp; 3-putts: ${threes}</div>
+    </div>`;
+  }).join('');
+  saveState();
+}
+
+function setPutt(pi, val) {
+  const prev = G.putts[G.hole-1][pi];
+  if (prev === val) return;
+  // Adjust cards
+  if (val===1 && prev!==1) G.hands[pi].push(draw());
+  if (prev===1 && val!==1 && G.hands[pi].length>2) G.hands[pi].pop();
+  // Adjust pot
+  if (typeof G.pot === 'number') {
+    if (val===3 && prev!==3) G.pot += G.penalty;
+    if (prev===3 && val!==3) G.pot -= G.penalty;
+  }
+  G.putts[G.hole-1][pi] = val;
+  renderRound();
+}
+
+function nextHole() {
+  if (G.hole < G.holes) { G.hole++; renderRound(); }
+  else goPoker();
+}
+function prevHole() {
+  if (G.hole > 1) { G.hole--; renderRound(); }
+}
+function goPoker() {
+  G.pokerPhase = 'preflop';
+  G.discarded = [[],[],[],[]];
+  G.community = [];
+  renderPoker();
+  showScreen('poker');
+}
+
+function confirmReset() {
+  if (confirm('Reset game and go back to setup?')) {
+    localStorage.removeItem('cg_state');
+    initG();
+    showScreen('setup');
+  }
+}
+
+// ---- POKER ----
+function renderPoker() {
+  const phases = ['preflop','flop','discarding','turn','river','showdown'];
+  const labels = ['Pre-flop','Flop','Discard','Turn','River','Showdown'];
+  const pi = phases.indexOf(G.pokerPhase);
+
+  let html = '';
+
+  // Phase steps
+  html += `<div class="phase-steps">`;
+  ['Flop','Discard','Turn','River','Showdown'].forEach((l,i) => {
+    const stepPhases = ['flop','discarding','turn','river','showdown'];
+    const sp = phases.indexOf(stepPhases[i]);
+    const cls = sp < pi ? 'done' : sp === pi ? 'active' : '';
+    html += `<div class="phase-step ${cls}">${l}</div>`;
+  });
+  html += `</div>`;
+
+  // Pot
+  html += `<div class="pot-header" style="margin-bottom:16px;">
+    <div class="pot-section"><div class="pot-lbl">Pot</div><div class="pot-val">${fmt(G.pot)}</div></div>
+  </div>`;
+
+  // Community cards
+  html += `<div class="card-title" style="margin-bottom:10px;">Community cards</div>`;
+  html += `<div class="hand-row" style="margin-bottom:16px;">`;
+  const shown = {preflop:0,flop:3,discarding:3,turn:4,river:5,showdown:5}[G.pokerPhase]||0;
+  if (!G.community.length && shown > 0) {
+    G.community = [draw(),draw(),draw(),draw(),draw()];
+    saveState();
+  }
+  for (let i=0;i<5;i++) {
+    if (i<shown && G.community[i]) {
+      const c = G.community[i];
+      html += `<div class="playing-card community ${RED.has(c.s)?'red':'black'}"><span>${c.r}</span><span style="font-size:12px;">${c.s}</span></div>`;
+    } else {
+      const label = i<3?'F':i===3?'T':'R';
+      html += `<div class="playing-card hidden-card">${label}</div>`;
+    }
+  }
+  html += `</div>`;
+
+  html += `<div class="sep"></div>`;
+
+  // Player hands
+  if (G.pokerPhase === 'preflop') {
+    html += `<p class="hint">Deal the flop when everyone is ready.</p>`;
+    html += `<button class="btn btn-primary" onclick="dealFlop()">Deal flop</button>`;
+  } else if (G.pokerPhase === 'flop') {
+    html += `<p class="hint">Tap cards to discard after seeing the flop. Then deal the turn.</p>`;
+    html += renderHands(true);
+    html += `<button class="btn btn-primary" onclick="dealTurn()">Deal turn</button>`;
+  } else if (G.pokerPhase === 'turn') {
+    html += renderHands(false);
+    html += `<button class="btn btn-primary" onclick="dealRiver()">Deal river</button>`;
+  } else if (G.pokerPhase === 'river') {
+    html += renderHands(false);
+    html += `<button class="btn btn-green" onclick="doShowdown()">Showdown 🂡</button>`;
+  } else if (G.pokerPhase === 'showdown') {
+    html += renderShowdown();
+  }
+
+  document.getElementById('poker-scroll').innerHTML = html;
+  saveState();
+}
+
+function renderHands(discardable) {
+  return G.players.map((name,pi) => {
+    const cards = G.hands[pi].map((c,ci) => {
+      const disc = G.discarded[pi].includes(ci);
+      const clickable = discardable ? `onclick="toggleDiscard(${pi},${ci})"` : '';
+      return `<div class="playing-card ${RED.has(c.s)?'red':'black'} ${disc?'discarded':''}" ${clickable}>
+        <span>${c.r}</span><span style="font-size:12px;">${c.s}</span>
+      </div>`;
+    }).join('');
+    const discCount = G.discarded[pi].length;
+    return `<div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:15px;font-weight:600;">${name}</span>
+        ${discardable && discCount>0 ? `<span class="badge badge-red">${discCount} discarded</span>` : ''}
+      </div>
+      <div class="hand-row">${cards}</div>
+    </div>`;
+  }).join('<div class="sep"></div>');
+}
+
+function toggleDiscard(pi, ci) {
+  const idx = G.discarded[pi].indexOf(ci);
+  if (idx===-1) G.discarded[pi].push(ci);
+  else G.discarded[pi].splice(idx,1);
+  renderPoker();
+}
+
+function dealFlop() {
+  if (!G.community.length) G.community = [draw(),draw(),draw(),draw(),draw()];
+  G.pokerPhase = 'flop';
+  renderPoker();
+}
+function dealTurn() { G.pokerPhase = 'turn'; renderPoker(); }
+function dealRiver() { G.pokerPhase = 'river'; renderPoker(); }
+function doShowdown() { G.pokerPhase = 'showdown'; renderPoker(); }
+
+function renderShowdown() {
+  const community = G.community.slice(0,5);
+  const results = G.players.map((name,pi) => {
+    const kept = G.hands[pi].filter((_,ci)=>!G.discarded[pi].includes(ci));
+    const all = [...kept, ...community];
+    const best = bestHand(all);
+    return { name, pi, kept, best };
+  }).sort((a,b) => compareHands(b.best,a.best));
+
+  const winner = results[0];
+  let html = `<div class="winner-card">
+    <div style="font-size:12px;color:var(--green);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Winner</div>
+    <div class="winner-name">${winner.name}</div>
+    <div class="winner-sub">${winner.best.name} · Takes ${fmt(G.pot)}</div>
+  </div>`;
+
+  html += results.map((r,rank) => {
+    const isWin = rank===0;
+    const cards = r.kept.map(c=>`<div class="playing-card ${RED.has(c.s)?'red':'black'}">
+      <span>${c.r}</span><span style="font-size:12px;">${c.s}</span>
+    </div>`).join('');
+    return `<div class="${isWin?'winner-card':'card'}" style="${isWin?'':'margin-bottom:10px;'}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:15px;font-weight:600;">${r.name}</span>
+        <span class="badge ${isWin?'badge-green':'badge-amber'}">${r.best.name}</span>
+      </div>
+      <div class="hand-row">${cards}</div>
+    </div>`;
+  }).join('');
+
+  html += `<div class="sep"></div><button class="btn btn-secondary" onclick="confirmReset()">New game</button>`;
+  return html;
+}
+
+// ---- HAND EVALUATOR ----
+function bestHand(cards) {
+  if (!cards.length) return {name:'No cards',tier:-1,vals:[]};
+  const combos = cards.length >= 5 ? choose5(cards) : [cards];
+  let best = null;
+  for (const c of combos) {
+    const h = evalHand(c);
+    if (!best || compareHands(h,best)>0) best=h;
+  }
+  return best;
+}
+
+function choose5(arr) {
+  const result=[];
+  function go(start,chosen) {
+    if (chosen.length===5){result.push([...chosen]);return;}
+    if (arr.length-start+chosen.length<5) return;
+    go(start+1,[...chosen,arr[start]]);
+    go(start+1,chosen);
+  }
+  go(0,[]);
+  return result;
+}
+
+function evalHand(cards) {
+  const vals = cards.map(c=>RANK_VAL[c.r]).sort((a,b)=>b-a);
+  const suits = cards.map(c=>c.s);
+  const counts={};
+  vals.forEach(v=>counts[v]=(counts[v]||0)+1);
+  const groups=Object.values(counts).sort((a,b)=>b-a);
+  const isFlush = cards.length>=5 && new Set(suits).size===1;
+  const isStraight = checkStraight(vals);
+  let tier,name;
+  if (isFlush&&isStraight&&vals[0]===14){tier=9;name='Royal flush';}
+  else if (isFlush&&isStraight){tier=8;name='Straight flush';}
+  else if (groups[0]===4){tier=7;name='Four of a kind';}
+  else if (groups[0]===3&&groups[1]===2){tier=6;name='Full house';}
+  else if (isFlush){tier=5;name='Flush';}
+  else if (isStraight){tier=4;name='Straight';}
+  else if (groups[0]===3){tier=3;name='Three of a kind';}
+  else if (groups[0]===2&&groups[1]===2){tier=2;name='Two pair';}
+  else if (groups[0]===2){tier=1;name='One pair';}
+  else{tier=0;name='High card';}
+  return {name,tier,vals};
+}
+
+function checkStraight(sorted) {
+  const u=[...new Set(sorted)];
+  if (u.length<5) return false;
+  if (u[0]-u[4]===4) return true;
+  if (u.includes(14)&&u.includes(2)&&u.includes(3)&&u.includes(4)&&u.includes(5)) return true;
+  return false;
+}
+
+function compareHands(a,b) {
+  if (a.tier!==b.tier) return a.tier-b.tier;
+  for (let i=0;i<Math.max(a.vals.length,b.vals.length);i++){
+    const av=a.vals[i]||0,bv=b.vals[i]||0;
+    if (av!==bv) return av-bv;
+  }
+  return 0;
+}
+
+// ---- SERVICE WORKER ----
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+}
+
+// ---- INIT ----
+initG();
+if (loadState() && G.hole > 1) {
+  // Resume saved game
+  const resume = confirm('Resume your last game?');
+  if (resume) {
+    if (G.pokerPhase !== 'preflop') {
+      renderPoker(); showScreen('poker');
+    } else {
+      renderRound(); showScreen('round');
+    }
+  } else {
+    localStorage.removeItem('cg_state');
+    initG();
+  }
+}
+</script>
+</body>
+</html>
