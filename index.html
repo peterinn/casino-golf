@@ -430,7 +430,7 @@ function evalHand(cards){
 function chkSt(s){const u=[...new Set(s)];if(u.length<5)return false;if(u[0]-u[4]===4)return true;if(u.includes(14)&&u.includes(2)&&u.includes(3)&&u.includes(4)&&u.includes(5))return true;return false;}
 function compareHands(a,b){if(a.tier!==b.tier)return a.tier-b.tier;for(let i=0;i<Math.max(a.vals.length,b.vals.length);i++){const av=a.vals[i]||0,bv=b.vals[i]||0;if(av!==bv)return av-bv;}return 0;}
 
-if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/casino-golf/sw.js').catch(()=>{});
 
 initG();
 if(load()&&G.hole>1){
