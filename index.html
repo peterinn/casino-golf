@@ -6,624 +6,436 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Casino Golf">
-  <meta name="theme-color" content="#1a1a1a">
+  <meta name="theme-color" content="#04170e">
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1" rel="stylesheet">
   <title>Casino Golf</title>
   <style>
     :root {
-      --bg: #111;
-      --bg2: #1c1c1e;
-      --bg3: #2c2c2e;
-      --bg4: #3a3a3c;
-      --text: #fff;
-      --text2: rgba(255,255,255,0.6);
-      --text3: rgba(255,255,255,0.35);
-      --green: #30d158;
-      --green-bg: rgba(48,209,88,0.15);
-      --red: #ff453a;
-      --red-bg: rgba(255,69,58,0.15);
-      --amber: #ffd60a;
-      --amber-bg: rgba(255,214,10,0.12);
-      --blue: #0a84ff;
-      --blue-bg: rgba(10,132,255,0.15);
-      --border: rgba(255,255,255,0.1);
-      --radius: 14px;
-      --radius-sm: 10px;
+      --primary: #e6c364;
+      --primary-dim: #b9993e;
+      --on-primary: #3d2e00;
+      --surface: #04170e;
+      --surface-low: #0b1f16;
+      --surface-mid: #0f231a;
+      --surface-high: #1a2e24;
+      --surface-highest: #25392e;
+      --surface-bright: #293e32;
+      --surface-lowest: #011209;
+      --on-surface: #d0e8d8;
+      --on-surface-dim: #c1c8c2;
+      --tertiary: #4ae183;
+      --tertiary-bg: rgba(74,225,131,0.12);
+      --outline: #8b928c;
+      --red-suit: #c0392b;
+      --black-suit: #1a1a2e;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; overflow: hidden; }
+    html, body { height: 100%; background: var(--surface); color: var(--on-surface); font-family: 'Inter', -apple-system, sans-serif; overflow: hidden; }
+    .ms { font-family: 'Material Symbols Outlined'; font-weight: 400; font-style: normal; display: inline-block; line-height: 1; text-transform: none; }
+    .ms.fill { font-variation-settings: 'FILL' 1; }
 
+    /* SCREENS */
     .screen { display: none; flex-direction: column; height: 100vh; height: 100dvh; }
     .screen.active { display: flex; }
 
-    /* NAV BAR */
-    .nav { display: flex; align-items: center; justify-content: space-between; padding: env(safe-area-inset-top, 44px) 20px 12px; background: rgba(17,17,17,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
-    .nav-title { font-size: 17px; font-weight: 600; }
-    .nav-btn { font-size: 16px; color: var(--blue); background: none; border: none; cursor: pointer; padding: 4px 0; min-width: 44px; }
-    .nav-btn.right { text-align: right; }
-    .nav-btn.left { text-align: left; }
+    /* AMBIENT */
+    .amb { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .amb-a { position: absolute; top: -100px; left: -80px; width: 280px; height: 280px; background: rgba(230,195,100,0.07); border-radius: 50%; filter: blur(90px); }
+    .amb-b { position: absolute; bottom: 15%; right: -60px; width: 300px; height: 300px; background: rgba(74,225,131,0.04); border-radius: 50%; filter: blur(100px); }
+    .amb-c { position: absolute; top: 35%; left: 50%; transform: translateX(-50%); width: 380px; height: 160px; background: radial-gradient(ellipse, rgba(230,195,100,0.06) 0%, transparent 70%); }
 
-    /* SCROLL BODY */
-    .scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 16px; padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 80px); }
+    /* HEADER */
+    .hdr { position: relative; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: max(env(safe-area-inset-top,44px),44px) 22px 14px; background: linear-gradient(to bottom, var(--surface) 55%, transparent); flex-shrink: 0; }
+    .hdr-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 14px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--primary); }
+    .hdr-btn { background: none; border: none; color: var(--primary); font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.05em; cursor: pointer; padding: 6px 0; min-width: 60px; }
+    .hdr-btn.right { text-align: right; }
 
-    /* BOTTOM TAB BAR */
-    .tab-bar { display: flex; background: rgba(17,17,17,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 0.5px solid var(--border); padding-bottom: env(safe-area-inset-bottom, 0px); flex-shrink: 0; }
-    .tab { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 3px; background: none; border: none; cursor: pointer; color: var(--text3); }
-    .tab.active { color: var(--blue); }
-    .tab-icon { font-size: 22px; }
-    .tab-label { font-size: 10px; font-weight: 500; }
+    /* SCROLL */
+    .scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 6px 20px; padding-bottom: calc(env(safe-area-inset-bottom,20px) + 90px); position: relative; z-index: 1; }
+    .scroll.no-nav { padding-bottom: calc(env(safe-area-inset-bottom,20px) + 20px); }
+
+    /* BOTTOM NAV */
+    .bnav { position: relative; z-index: 10; display: flex; background: rgba(4,23,14,0.94); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top-left-radius: 22px; border-top-right-radius: 22px; box-shadow: 0 -6px 32px rgba(0,0,0,0.45); padding-bottom: env(safe-area-inset-bottom,0px); flex-shrink: 0; }
+    .ni { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 11px 0 9px; gap: 3px; background: none; border: none; cursor: pointer; color: rgba(208,232,216,0.35); transition: color 0.18s; }
+    .ni.active { color: var(--primary); }
+    .ni-pip { padding: 2px 14px; border-radius: 14px; }
+    .ni.active .ni-pip { background: rgba(230,195,100,0.1); }
+    .ni-icon { font-size: 22px; }
+    .ni-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; font-family: 'Inter', sans-serif; }
+
+    /* TYPOGRAPHY */
+    .sec-lbl { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 11px; color: var(--on-surface-dim); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
 
     /* CARDS */
-    .card { background: var(--bg2); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; border: 0.5px solid var(--border); }
-    .card-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px; }
-
-    /* FORM */
-    .field { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
-    .field:last-child { border-bottom: none; }
-    .field-label { font-size: 16px; color: var(--text); flex: 1; }
-    .field input, .field select { background: var(--bg3); border: none; border-radius: 8px; color: var(--text); font-size: 16px; padding: 7px 12px; text-align: right; outline: none; }
-    .field input { width: 140px; }
-    .field select { -webkit-appearance: none; }
-
-    /* PLAYER CHIPS */
-    .avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
-    .av0 { background: rgba(94,92,230,0.25); color: #7c7aff; }
-    .av1 { background: rgba(48,209,88,0.2); color: #30d158; }
-    .av2 { background: rgba(255,159,10,0.2); color: #ff9f0a; }
-    .av3 { background: rgba(255,69,58,0.2); color: #ff453a; }
+    .felt { background: var(--surface-high); border-radius: 20px; padding: 18px; margin-bottom: 12px; }
+    .felt-lo { background: var(--surface-mid); border-radius: 20px; padding: 16px; margin-bottom: 12px; }
 
     /* BUTTONS */
-    .btn { width: 100%; padding: 15px; border-radius: var(--radius); font-size: 17px; font-weight: 600; border: none; cursor: pointer; margin-bottom: 10px; }
-    .btn-primary { background: var(--blue); color: #fff; }
-    .btn-secondary { background: var(--bg3); color: var(--text); }
-    .btn-green { background: var(--green); color: #000; }
-    .btn-danger { background: var(--red-bg); color: var(--red); }
+    .btn-gold { width: 100%; padding: 16px; border-radius: 9999px; border: none; cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase; background: linear-gradient(135deg, #e6c364 0%, #b9993e 100%); color: var(--on-primary); transition: transform 0.14s, opacity 0.14s; margin-bottom: 10px; }
+    .btn-gold:active { transform: scale(0.97); opacity: 0.88; }
+    .btn-outline { width: 100%; padding: 15px; border-radius: 9999px; border: 1px solid rgba(230,195,100,0.22); cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; background: var(--surface-high); color: var(--primary); transition: transform 0.14s; margin-bottom: 10px; }
+    .btn-outline:active { transform: scale(0.97); }
 
-    /* BIG STAT */
-    .big-stat { text-align: center; padding: 8px 0 16px; }
-    .big-num { font-size: 48px; font-weight: 700; letter-spacing: -1px; }
-    .big-label { font-size: 14px; color: var(--text2); margin-top: 2px; }
+    /* FORM */
+    .sleek-input { background: var(--surface-lowest); border: none; border-radius: 10px; color: var(--on-surface); font-size: 15px; font-family: 'Inter', sans-serif; padding: 9px 12px; outline: none; flex: 1; transition: box-shadow 0.2s; }
+    .sleek-input:focus { box-shadow: 0 0 0 2px rgba(230,195,100,0.3); }
+    .sleek-select { background: var(--surface-lowest); border: none; border-radius: 10px; color: var(--on-surface); font-size: 14px; font-family: 'Inter', sans-serif; padding: 9px 12px; outline: none; -webkit-appearance: none; cursor: pointer; }
+    .pfield { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(66,72,67,0.25); }
+    .pfield:last-child { border-bottom: none; }
+    .srow { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid rgba(66,72,67,0.25); }
+    .srow:last-child { border-bottom: none; }
+    .srow-lbl { font-size: 15px; color: var(--on-surface); }
+    .srow-hint { font-size: 11px; color: var(--on-surface-dim); margin-top: 2px; }
 
-    /* PLAYER STATS ROW */
-    .player-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-    .pstat { background: var(--bg2); border-radius: var(--radius-sm); padding: 12px; border: 0.5px solid var(--border); }
-    .pstat-name { font-size: 12px; color: var(--text2); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .pstat-val { font-size: 20px; font-weight: 600; }
-    .pstat-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    /* AVATARS */
+    .av { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 11px; flex-shrink: 0; }
+    .av0 { background: rgba(94,92,230,0.18); color: #9d9bff; }
+    .av1 { background: rgba(74,225,131,0.14); color: #4ae183; }
+    .av2 { background: rgba(230,195,100,0.14); color: #e6c364; }
+    .av3 { background: rgba(255,107,107,0.14); color: #ff6b6b; }
 
-    /* PUTT LOGGER */
-    .putt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .putt-player { background: var(--bg2); border-radius: var(--radius-sm); padding: 14px; border: 0.5px solid var(--border); }
-    .putt-name { font-size: 13px; color: var(--text2); margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .putt-btns { display: flex; gap: 6px; }
-    .pb { flex: 1; padding: 10px 0; border-radius: 8px; border: none; font-size: 18px; font-weight: 600; cursor: pointer; background: var(--bg3); color: var(--text2); transition: all 0.12s; }
-    .pb.p1 { background: var(--green-bg); color: var(--green); }
-    .pb.p2 { background: var(--bg3); color: var(--text2); }
-    .pb.p3 { background: var(--red-bg); color: var(--red); }
-    .pb.active { transform: scale(0.95); }
+    /* POT HERO */
+    .pot-hero { text-align: center; padding: 10px 0 18px; }
+    .pot-amt { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 50px; color: var(--primary); letter-spacing: -1.5px; line-height: 1; }
+    .pot-lbl { font-size: 11px; color: var(--on-surface-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
 
-    /* PROGRESS BAR */
-    .progress-wrap { background: var(--bg3); border-radius: 4px; height: 4px; margin-bottom: 16px; overflow: hidden; }
-    .progress-bar { height: 4px; background: var(--blue); border-radius: 4px; transition: width 0.3s; }
-
-    /* POKER CARDS */
-    .playing-card { width: 48px; height: 66px; border-radius: 9px; border: 1px solid var(--border); background: var(--bg2); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; cursor: pointer; transition: transform 0.12s, opacity 0.12s; user-select: none; flex-shrink: 0; }
-    .playing-card.red { color: #ff453a; }
-    .playing-card.black { color: #fff; }
-    .playing-card.discarded { opacity: 0.2; transform: translateY(6px) scale(0.93); border-style: dashed; }
-    .playing-card.community { cursor: default; background: var(--bg3); }
-    .playing-card.hidden-card { background: var(--bg3); color: var(--text3); font-size: 20px; cursor: default; }
-    .hand-row { display: flex; gap: 8px; flex-wrap: wrap; padding: 4px 0 8px; }
-
-    /* BADGE */
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .badge-green { background: var(--green-bg); color: var(--green); }
-    .badge-amber { background: var(--amber-bg); color: var(--amber); }
-    .badge-blue { background: var(--blue-bg); color: var(--blue); }
-    .badge-red { background: var(--red-bg); color: var(--red); }
-
-    /* WINNER */
-    .winner-card { background: var(--green-bg); border: 1px solid var(--green); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
-    .winner-name { font-size: 22px; font-weight: 700; color: var(--green); }
-    .winner-sub { font-size: 14px; color: var(--text2); margin-top: 4px; }
-
-    /* POKER PHASE STEPS */
-    .phase-steps { display: flex; gap: 0; margin-bottom: 20px; }
-    .phase-step { flex: 1; text-align: center; font-size: 11px; font-weight: 600; padding: 7px 4px; color: var(--text3); border-bottom: 2px solid var(--bg3); }
-    .phase-step.done { color: var(--text2); border-bottom-color: var(--bg4); }
-    .phase-step.active { color: var(--blue); border-bottom-color: var(--blue); }
-
-    /* SEPARATOR */
-    .sep { height: 0.5px; background: var(--border); margin: 12px 0; }
-
-    /* HINT */
-    .hint { font-size: 13px; color: var(--text3); margin-bottom: 10px; line-height: 1.4; }
+    /* PROGRESS */
+    .prog-track { background: var(--surface-lowest); border-radius: 4px; height: 3px; margin-bottom: 18px; overflow: hidden; }
+    .prog-fill { height: 3px; background: linear-gradient(90deg, #b9993e, #e6c364); border-radius: 4px; transition: width 0.35s ease; }
 
     /* HOLE NAV */
-    .hole-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .hole-nav-btn { background: var(--bg3); border: none; color: var(--text); font-size: 20px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .hole-nav-btn:disabled { opacity: 0.3; }
-    .hole-info { text-align: center; }
-    .hole-big { font-size: 28px; font-weight: 700; }
-    .hole-sub { font-size: 13px; color: var(--text2); }
+    .h-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .h-arr { width: 44px; height: 44px; border-radius: 50%; background: var(--surface-highest); border: none; color: var(--on-surface); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.14s; }
+    .h-arr:disabled { opacity: 0.28; }
+    .h-arr:active:not(:disabled) { background: var(--surface-bright); }
+    .h-info { text-align: center; }
+    .h-big { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 30px; }
+    .h-sub { font-size: 12px; color: var(--on-surface-dim); margin-top: 2px; }
 
-    /* POT HEADER */
-    .pot-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg2); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; border: 0.5px solid var(--border); }
-    .pot-section { text-align: center; }
-    .pot-section:first-child { text-align: left; }
-    .pot-section:last-child { text-align: right; }
-    .pot-val { font-size: 22px; font-weight: 700; }
-    .pot-lbl { font-size: 11px; color: var(--text2); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+    /* PUTT GRID */
+    .putt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .pp { background: var(--surface-high); border-radius: 16px; padding: 14px; }
+    .pp-name { font-size: 11px; color: var(--on-surface-dim); font-weight: 600; margin-bottom: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.05em; }
+    .putt-btns { display: flex; gap: 6px; }
+    .pb { flex: 1; padding: 10px 0; border-radius: 10px; border: none; font-size: 18px; font-weight: 700; font-family: 'Manrope', sans-serif; cursor: pointer; background: var(--surface-lowest); color: var(--on-surface-dim); transition: transform 0.1s; }
+    .pb:active { transform: scale(0.91); }
+    .pb.p1 { background: rgba(74,225,131,0.14); color: var(--tertiary); }
+    .pb.p2 { background: var(--surface-lowest); color: var(--on-surface-dim); }
+    .pb.p3 { background: rgba(255,107,107,0.14); color: #ff6b6b; }
+
+    /* STATS */
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat { background: var(--surface-lowest); border-radius: 14px; padding: 12px 14px; }
+    .stat-name { font-size: 11px; color: var(--on-surface-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stat-val { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 24px; color: var(--primary); }
+    .stat-sub { font-size: 11px; color: var(--on-surface-dim); margin-top: 3px; }
+
+    /* PHASE STEPS */
+    .psteps { display: flex; margin-bottom: 18px; }
+    .pstep { flex: 1; text-align: center; font-size: 10px; font-weight: 700; font-family: 'Manrope', sans-serif; padding: 8px 2px; color: rgba(208,232,216,0.28); border-bottom: 2px solid var(--surface-mid); letter-spacing: 0.05em; text-transform: uppercase; }
+    .pstep.done { color: var(--on-surface-dim); border-bottom-color: var(--surface-high); }
+    .pstep.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* PLAYING CARDS */
+    .ctable { background: var(--surface-lowest); border-radius: 18px; padding: 14px 14px 10px; margin-bottom: 14px; }
+    .comm-row { display: flex; gap: 7px; justify-content: center; }
+    .hand-row { display: flex; gap: 7px; flex-wrap: wrap; padding: 2px 0; }
+    .pc { width: 44px; height: 62px; border-radius: 9px; background: #f5f0e0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.12s, opacity 0.12s; user-select: none; flex-shrink: 0; box-shadow: 0 4px 14px rgba(0,0,0,0.55); }
+    .pc .rk { font-size: 13px; font-weight: 800; font-family: 'Manrope', sans-serif; line-height: 1.1; }
+    .pc .st { font-size: 13px; line-height: 1; }
+    .pc.red { color: var(--red-suit); }
+    .pc.black { color: var(--black-suit); }
+    .pc.disc { opacity: 0.16; transform: translateY(8px) scale(0.88); box-shadow: none; }
+    .pc:not(.comm):not(.disc):hover { transform: translateY(-5px); box-shadow: 0 10px 22px rgba(0,0,0,0.65); }
+    .pc.comm { cursor: default; }
+    .pc-hidden { width: 44px; height: 62px; border-radius: 9px; background: var(--surface-high); border: 1px solid rgba(66,72,67,0.4); display: inline-flex; align-items: center; justify-content: center; color: var(--outline); font-size: 10px; font-weight: 700; font-family: 'Manrope', sans-serif; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+
+    /* BADGE */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; font-family: 'Manrope', sans-serif; letter-spacing: 0.05em; text-transform: uppercase; }
+    .badge-g { background: rgba(74,225,131,0.1); border: 1px solid rgba(74,225,131,0.2); color: var(--tertiary); }
+    .badge-au { background: rgba(230,195,100,0.1); border: 1px solid rgba(230,195,100,0.2); color: var(--primary); }
+    .badge-r { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.2); color: #ff6b6b; }
+
+    /* WINNER */
+    .trophy-wrap { position: relative; text-align: center; padding: 16px 0 4px; }
+    .trophy-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 180px; height: 180px; background: radial-gradient(circle, rgba(230,195,100,0.22) 0%, transparent 70%); pointer-events: none; }
+    .win-name { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 38px; color: var(--on-surface); letter-spacing: -0.5px; line-height: 1.05; text-align: center; margin-bottom: 10px; }
+    .lb-row { background: var(--surface-high); border-radius: 16px; padding: 13px 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 11px; }
+    .lb-row.win { background: rgba(74,225,131,0.07); border: 1px solid rgba(74,225,131,0.18); }
+    .rank-circ { width: 34px; height: 34px; border-radius: 50%; background: var(--surface-lowest); display: flex; align-items: center; justify-content: center; font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 13px; color: var(--on-surface-dim); flex-shrink: 0; }
+    .rank-circ.first { background: rgba(230,195,100,0.14); color: var(--primary); }
+    .mini-c { background: #f5f0e0; border-radius: 5px; padding: 2px 5px; font-size: 11px; font-weight: 700; font-family: 'Manrope', sans-serif; }
+    .mini-c.red { color: var(--red-suit); }
+    .mini-c.black { color: var(--black-suit); }
+
+    /* HINT */
+    .hint { font-size: 13px; color: var(--on-surface-dim); margin-bottom: 14px; line-height: 1.55; }
+    .sep { height: 1px; background: rgba(66,72,67,0.22); margin: 13px 0; }
   </style>
 </head>
 <body>
 
-<!-- ===================== SETUP SCREEN ===================== -->
+<div class="amb"><div class="amb-a"></div><div class="amb-b"></div><div class="amb-c"></div></div>
+
+<!-- ===== SETUP ===== -->
 <div class="screen active" id="screen-setup">
-  <div class="nav">
-    <span style="min-width:44px;"></span>
-    <span class="nav-title">Casino Golf</span>
-    <button class="nav-btn right" onclick="startGame()">Start</button>
+  <div class="hdr">
+    <span style="width:60px;"></span>
+    <span class="hdr-title">Executive Fairway</span>
+    <span style="width:60px;"></span>
   </div>
-  <div class="scroll">
-    <div class="card">
-      <div class="card-title">Players</div>
-      <div class="field"><div class="avatar av0" id="av0">P1</div><input id="n0" value="Player 1" oninput="updateAv(0)" placeholder="Name"></div>
-      <div class="field"><div class="avatar av1" id="av1">P2</div><input id="n1" value="Player 2" oninput="updateAv(1)" placeholder="Name"></div>
-      <div class="field"><div class="avatar av2" id="av2">P3</div><input id="n2" value="Player 3" oninput="updateAv(2)" placeholder="Name"></div>
-      <div class="field"><div class="avatar av3" id="av3">P4</div><input id="n3" value="Player 4" oninput="updateAv(3)" placeholder="Name"></div>
+  <div class="scroll no-nav">
+    <div style="text-align:center;padding:4px 0 22px;">
+      <div style="font-size:11px;color:var(--on-surface-dim);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;font-family:'Manrope',sans-serif;">Casino Golf</div>
+      <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:26px;color:var(--on-surface);margin-top:5px;letter-spacing:-0.5px;">The Midnight Clubhouse</div>
     </div>
-    <div class="card">
-      <div class="card-title">Game settings</div>
-      <div class="field">
-        <span class="field-label">Buy-in</span>
-        <select id="buyin">
-          <option value="500">500 ISK</option>
-          <option value="1000">1000 ISK</option>
-          <option value="5eur">5 EUR</option>
-        </select>
-      </div>
-      <div class="field">
-        <span class="field-label">3-putt penalty</span>
-        <select id="penalty">
-          <option value="500">500 ISK</option>
-          <option value="1000">1000 ISK</option>
-        </select>
-      </div>
-      <div class="field">
-        <span class="field-label">Holes</span>
-        <select id="holecount">
-          <option value="9">9 holes</option>
-          <option value="18" selected>18 holes</option>
-        </select>
+    <div class="sec-lbl">Players</div>
+    <div class="felt">
+      <div class="pfield"><div class="av av0" id="av0">P1</div><input class="sleek-input" id="n0" value="Player 1" oninput="updateAv(0)"></div>
+      <div class="pfield"><div class="av av1" id="av1">P2</div><input class="sleek-input" id="n1" value="Player 2" oninput="updateAv(1)"></div>
+      <div class="pfield"><div class="av av2" id="av2">P3</div><input class="sleek-input" id="n2" value="Player 3" oninput="updateAv(2)"></div>
+      <div class="pfield"><div class="av av3" id="av3">P4</div><input class="sleek-input" id="n3" value="Player 4" oninput="updateAv(3)"></div>
+    </div>
+    <div class="sec-lbl">Game Settings</div>
+    <div class="felt">
+      <div class="srow"><div><div class="srow-lbl">Buy-in</div><div class="srow-hint">Per player · goes to pot</div></div><select class="sleek-select" id="buyin"><option value="500">500 ISK</option><option value="1000">1000 ISK</option><option value="5eur">5 EUR</option></select></div>
+      <div class="srow"><div><div class="srow-lbl">3-putt penalty</div><div class="srow-hint">Added to pot</div></div><select class="sleek-select" id="penalty"><option value="500">500 ISK</option><option value="1000">1000 ISK</option></select></div>
+      <div class="srow"><div><div class="srow-lbl">Holes</div></div><select class="sleek-select" id="holecount"><option value="9">9 holes</option><option value="18" selected>18 holes</option></select></div>
+    </div>
+    <div class="felt-lo" style="margin-bottom:22px;">
+      <div style="font-size:13px;color:var(--on-surface-dim);line-height:1.75;">
+        <span style="color:var(--tertiary);font-weight:600;">1-putt</span> — draw a new card &nbsp;·&nbsp; <span style="color:#ff6b6b;font-weight:600;">3-putt</span> — pay into pot<br>
+        After the round: poker hand decides the winner.
       </div>
     </div>
-    <div style="background:rgba(10,132,255,0.08);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;border:0.5px solid rgba(10,132,255,0.25);">
-      <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;">
-        <b style="color:rgba(255,255,255,0.8);">How to play</b><br>
-        Everyone starts with 2 cards. A <span style="color:#30d158;">1-putt</span> earns you a new card. A <span style="color:#ff453a;">3-putt</span> adds to the pot. After the round, play a poker hand — best 5-card hand wins the pot.
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="startGame()">Start game</button>
+    <button class="btn-gold" onclick="startGame()">Deal Me In</button>
   </div>
 </div>
 
-<!-- ===================== ROUND SCREEN ===================== -->
+<!-- ===== ROUND ===== -->
 <div class="screen" id="screen-round">
-  <div class="nav">
-    <button class="nav-btn left" onclick="confirmReset()">Reset</button>
-    <span class="nav-title" id="round-title">Round</span>
-    <button class="nav-btn right" onclick="goPoker()">Poker →</button>
+  <div class="hdr">
+    <button class="hdr-btn" onclick="confirmReset()">Reset</button>
+    <span class="hdr-title">Round</span>
+    <button class="hdr-btn right" onclick="goPoker()">Poker →</button>
   </div>
   <div class="scroll">
-    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
-    <div class="pot-header">
-      <div class="pot-section"><div class="pot-lbl">Pot</div><div class="pot-val" id="r-pot">0</div></div>
-      <div class="pot-section"><div class="pot-lbl">Hole</div><div class="pot-val" id="r-hole">1</div></div>
-      <div class="pot-section"><div class="pot-lbl">Cards</div><div id="r-cards" style="font-size:12px;color:var(--text2);text-align:right;margin-top:2px;"></div></div>
+    <div class="pot-hero">
+      <div class="pot-lbl">Current Pot</div>
+      <div class="pot-amt" id="r-pot">—</div>
     </div>
-    <div class="hole-nav">
-      <button class="hole-nav-btn" id="prev-btn" onclick="prevHole()" disabled>‹</button>
-      <div class="hole-info">
-        <div class="hole-big">Hole <span id="hole-num">1</span></div>
-        <div class="hole-sub">Tap each player's putt count</div>
-      </div>
-      <button class="hole-nav-btn" id="next-btn" onclick="nextHole()">›</button>
+    <div class="prog-track"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+    <div class="h-nav">
+      <button class="h-arr" id="prev-btn" onclick="prevHole()" disabled>‹</button>
+      <div class="h-info"><div class="h-big">Hole <span id="h-num">1</span></div><div class="h-sub" id="h-sub">of 18</div></div>
+      <button class="h-arr" id="next-btn" onclick="nextHole()">›</button>
     </div>
+    <div class="sec-lbl">Putts this hole</div>
     <div class="putt-grid" id="putt-grid"></div>
     <div class="sep"></div>
-    <div class="card-title" style="margin-bottom:8px;">Card hands</div>
-    <div class="player-stats" id="player-stats"></div>
+    <div class="sec-lbl">Card counts</div>
+    <div class="stat-grid" id="stat-grid"></div>
   </div>
+  <nav class="bnav">
+    <button class="ni active"><div class="ni-pip"><span class="ms ni-icon">golf_course</span></div><span class="ni-lbl">Round</span></button>
+    <button class="ni" onclick="goPoker()"><span class="ms ni-icon">style</span><span class="ni-lbl">Poker</span></button>
+  </nav>
 </div>
 
-<!-- ===================== POKER SCREEN ===================== -->
+<!-- ===== POKER ===== -->
 <div class="screen" id="screen-poker">
-  <div class="nav">
-    <button class="nav-btn left" onclick="showScreen('round')">← Round</button>
-    <span class="nav-title">Poker hand</span>
-    <span style="min-width:44px;"></span>
+  <div class="hdr">
+    <button class="hdr-btn" onclick="showScreen('round')">← Round</button>
+    <span class="hdr-title">Poker Hand</span>
+    <span style="width:60px;"></span>
   </div>
-  <div class="scroll" id="poker-scroll">
-    <!-- rendered by JS -->
+  <div class="scroll" id="poker-scroll"></div>
+  <nav class="bnav">
+    <button class="ni" onclick="showScreen('round')"><span class="ms ni-icon">golf_course</span><span class="ni-lbl">Round</span></button>
+    <button class="ni active"><div class="ni-pip"><span class="ms ni-icon">style</span></div><span class="ni-lbl">Poker</span></button>
+  </nav>
+</div>
+
+<!-- ===== WINNER ===== -->
+<div class="screen" id="screen-winner">
+  <div class="hdr">
+    <span style="width:60px;"></span>
+    <span class="hdr-title">Final Standings</span>
+    <span style="width:60px;"></span>
   </div>
+  <div class="scroll no-nav" id="winner-scroll"></div>
 </div>
 
 <script>
-const SUITS = ['♠','♥','♦','♣'];
-const RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-const RED = new Set(['♥','♦']);
-const RANK_VAL = Object.fromEntries(RANKS.map((r,i)=>[r,i+2]));
+const SUITS=['♠','♥','♦','♣'],RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const RED=new Set(['♥','♦']);
+const RV=Object.fromEntries(RANKS.map((r,i)=>[r,i+2]));
+let G={};
 
-let G = {};
+function initG(){G={players:['Player 1','Player 2','Player 3','Player 4'],buyin:500,buyin_label:'500 ISK',penalty:500,holes:18,pot:0,hole:1,putts:[],hands:[[],[],[],[]],community:[],discarded:[[],[],[],[]],pokerPhase:'preflop',deck:[]};}
+function save(){try{localStorage.setItem('cg3',JSON.stringify(G));}catch(e){}}
+function load(){try{const s=localStorage.getItem('cg3');if(s){G=JSON.parse(s);return true;}}catch(e){}return false;}
+function updateAv(i){const v=document.getElementById('n'+i).value;document.getElementById('av'+i).textContent=(v.slice(0,2)||'P'+(i+1)).toUpperCase();}
+function fmt(v){return typeof v==='string'?v:v.toLocaleString()+' ISK';}
+function buildDeck(){G.deck=[];for(let s of SUITS)for(let r of RANKS)G.deck.push({r,s});for(let i=G.deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[G.deck[i],G.deck[j]]=[G.deck[j],G.deck[i]];}}
+function draw(){return G.deck.length?G.deck.pop():{r:'?',s:'?'};}
 
-function initG() {
-  G = {
-    players: ['Player 1','Player 2','Player 3','Player 4'],
-    buyin: 500,
-    buyin_label: '500 ISK',
-    penalty: 500,
-    holes: 18,
-    pot: 0,
-    hole: 1,
-    putts: [],
-    hands: [[],[],[],[]],
-    community: [],
-    discarded: [[],[],[],[]],
-    pokerPhase: 'preflop',
-    deck: []
-  };
-}
-
-function saveState() {
-  try { localStorage.setItem('cg_state', JSON.stringify(G)); } catch(e) {}
-}
-function loadState() {
-  try {
-    const s = localStorage.getItem('cg_state');
-    if (s) { G = JSON.parse(s); return true; }
-  } catch(e) {}
-  return false;
-}
-
-function updateAv(i) {
-  const v = document.getElementById('n'+i).value;
-  document.getElementById('av'+i).textContent = (v.slice(0,2)||'P'+(i+1)).toUpperCase();
-}
-
-function fmt(v) {
-  if (typeof v === 'string') return v;
-  return v.toLocaleString() + ' ISK';
-}
-
-function buildDeck() {
-  G.deck = [];
-  for (let s of SUITS) for (let r of RANKS) G.deck.push({r,s});
-  for (let i=G.deck.length-1;i>0;i--) {
-    const j=Math.floor(Math.random()*(i+1));
-    [G.deck[i],G.deck[j]]=[G.deck[j],G.deck[i]];
-  }
-}
-function draw() { return G.deck.length ? G.deck.pop() : {r:'?',s:'?'}; }
-
-function startGame() {
+function startGame(){
   initG();
-  G.players = [0,1,2,3].map(i => document.getElementById('n'+i).value.trim() || 'Player '+(i+1));
-  const b = document.getElementById('buyin').value;
-  G.penalty = parseInt(document.getElementById('penalty').value);
-  G.holes = parseInt(document.getElementById('holecount').value);
-  if (b === '5eur') { G.buyin_label = '5 EUR'; G.pot = '20 EUR'; }
-  else { G.buyin = parseInt(b); G.buyin_label = b+' ISK'; G.pot = parseInt(b)*4; }
-  G.putts = Array.from({length: G.holes}, () => [2,2,2,2]);
+  G.players=[0,1,2,3].map(i=>document.getElementById('n'+i).value.trim()||'Player '+(i+1));
+  const b=document.getElementById('buyin').value;
+  G.penalty=parseInt(document.getElementById('penalty').value);
+  G.holes=parseInt(document.getElementById('holecount').value);
+  if(b==='5eur'){G.buyin_label='5 EUR';G.pot='20 EUR';}else{G.buyin=parseInt(b);G.buyin_label=b+' ISK';G.pot=G.buyin*4;}
+  G.putts=Array.from({length:G.holes},()=>[2,2,2,2]);
   buildDeck();
-  for (let p=0;p<4;p++) G.hands[p] = [draw(), draw()];
-  saveState();
-  renderRound();
-  showScreen('round');
+  for(let p=0;p<4;p++)G.hands[p]=[draw(),draw()];
+  save();renderRound();showScreen('round');
 }
 
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
-}
+function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active');}
 
-function renderRound() {
-  document.getElementById('round-title').textContent = `Hole ${G.hole} of ${G.holes}`;
-  document.getElementById('r-pot').textContent = fmt(G.pot);
-  document.getElementById('r-hole').textContent = `${G.hole}/${G.holes}`;
-  document.getElementById('hole-num').textContent = G.hole;
-  document.getElementById('progress-bar').style.width = ((G.hole-1)/G.holes*100)+'%';
-  document.getElementById('prev-btn').disabled = G.hole <= 1;
-  document.getElementById('next-btn').textContent = G.hole >= G.holes ? '→' : '›';
-
-  // Cards summary
-  const cardsEl = document.getElementById('r-cards');
-  cardsEl.innerHTML = G.players.map((n,i)=>`${n.split(' ')[0]}: ${G.hands[i].length}`).join('<br>');
-
-  // Putt grid
-  const pg = document.getElementById('putt-grid');
-  pg.innerHTML = G.players.map((name,pi) => {
-    const cur = G.putts[G.hole-1][pi];
-    return `<div class="putt-player">
-      <div class="putt-name">${name}</div>
-      <div class="putt-btns">
-        ${[1,2,3].map(n=>`<button class="pb ${n===cur?'p'+n:''}" onclick="setPutt(${pi},${n})">${n}</button>`).join('')}
-      </div>
-    </div>`;
+function renderRound(){
+  document.getElementById('r-pot').textContent=fmt(G.pot);
+  document.getElementById('h-num').textContent=G.hole;
+  document.getElementById('h-sub').textContent='of '+G.holes;
+  document.getElementById('prog').style.width=((G.hole-1)/G.holes*100)+'%';
+  document.getElementById('prev-btn').disabled=G.hole<=1;
+  document.getElementById('next-btn').innerHTML=G.hole>=G.holes?'→':'›';
+  document.getElementById('putt-grid').innerHTML=G.players.map((name,pi)=>{
+    const cur=G.putts[G.hole-1][pi];
+    return `<div class="pp"><div class="pp-name">${name}</div><div class="putt-btns">${[1,2,3].map(n=>`<button class="pb ${n===cur?'p'+n:''}" onclick="setPutt(${pi},${n})">${n}</button>`).join('')}</div></div>`;
   }).join('');
-
-  // Stats
-  const ps = document.getElementById('player-stats');
-  ps.innerHTML = G.players.map((name,i) => {
-    const ones = G.putts.slice(0,G.hole).filter((h,hi)=>hi<G.hole && h[i]===1).length;
-    const threes = G.putts.slice(0,G.hole).filter((h,hi)=>hi<G.hole && h[i]===3).length;
-    return `<div class="pstat">
-      <div class="pstat-name">${name}</div>
-      <div class="pstat-val">${G.hands[i].length} cards</div>
-      <div class="pstat-sub">1-putts: ${ones} &nbsp;·&nbsp; 3-putts: ${threes}</div>
-    </div>`;
+  document.getElementById('stat-grid').innerHTML=G.players.map((name,i)=>{
+    const ones=G.putts.slice(0,G.hole).filter(h=>h[i]===1).length;
+    const threes=G.putts.slice(0,G.hole).filter(h=>h[i]===3).length;
+    return `<div class="stat"><div class="stat-name">${name}</div><div class="stat-val">${G.hands[i].length}</div><div class="stat-sub">${ones} eagles · ${threes} bogeys</div></div>`;
   }).join('');
-  saveState();
+  save();
 }
 
-function setPutt(pi, val) {
-  const prev = G.putts[G.hole-1][pi];
-  if (prev === val) return;
-  // Adjust cards
-  if (val===1 && prev!==1) G.hands[pi].push(draw());
-  if (prev===1 && val!==1 && G.hands[pi].length>2) G.hands[pi].pop();
-  // Adjust pot
-  if (typeof G.pot === 'number') {
-    if (val===3 && prev!==3) G.pot += G.penalty;
-    if (prev===3 && val!==3) G.pot -= G.penalty;
+function setPutt(pi,val){
+  const prev=G.putts[G.hole-1][pi];
+  if(prev===val)return;
+  if(val===1&&prev!==1)G.hands[pi].push(draw());
+  if(prev===1&&val!==1&&G.hands[pi].length>2)G.hands[pi].pop();
+  if(typeof G.pot==='number'){if(val===3&&prev!==3)G.pot+=G.penalty;if(prev===3&&val!==3)G.pot-=G.penalty;}
+  G.putts[G.hole-1][pi]=val;renderRound();
+}
+function nextHole(){if(G.hole<G.holes){G.hole++;renderRound();}else goPoker();}
+function prevHole(){if(G.hole>1){G.hole--;renderRound();}}
+function goPoker(){G.pokerPhase='preflop';G.discarded=[[],[],[],[]];G.community=[];renderPoker();showScreen('poker');}
+function confirmReset(){if(confirm('Reset game?')){localStorage.removeItem('cg3');initG();showScreen('setup');}}
+
+function renderPoker(){
+  const phases=['preflop','flop','turn','river','showdown'];
+  const pi=phases.indexOf(G.pokerPhase);
+  const stepPhases=['flop','turn','river','showdown'];
+  let html=`<div class="psteps">${['Flop','Turn','River','Showdown'].map((l,i)=>{const sp=phases.indexOf(stepPhases[i]);const cls=sp<pi?'done':sp===pi?'active':'';return`<div class="pstep ${cls}">${l}</div>`;}).join('')}</div>`;
+  html+=`<div style="text-align:center;margin-bottom:18px;"><div style="font-size:11px;color:var(--on-surface-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;font-family:'Manrope',sans-serif;font-weight:700;">Final Pot</div><div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:42px;color:var(--primary);">${fmt(G.pot)}</div></div>`;
+
+  const shown={preflop:0,flop:3,turn:4,river:5,showdown:5}[G.pokerPhase]||0;
+  if(shown>0&&!G.community.length){G.community=[draw(),draw(),draw(),draw(),draw()];save();}
+
+  html+=`<div class="sec-lbl">Community Cards</div><div class="ctable"><div class="comm-row">`;
+  for(let i=0;i<5;i++){
+    if(i<shown&&G.community[i]){const c=G.community[i];html+=`<div class="pc comm ${RED.has(c.s)?'red':'black'}"><span class="rk">${c.r}</span><span class="st">${c.s}</span></div>`;}
+    else{const lbl=i<3?'Flop':i===3?'Turn':'River';html+=`<div class="pc-hidden">${lbl}</div>`;}
   }
-  G.putts[G.hole-1][pi] = val;
-  renderRound();
+  html+=`</div></div>`;
+
+  if(G.pokerPhase==='preflop'){
+    html+=`<p class="hint">Everyone holds their starting hand. Deal the flop when ready.</p>`;
+    html+=`<button class="btn-gold" onclick="dealFlop()">Deal Flop</button>`;
+  } else if(G.pokerPhase==='flop'){
+    html+=`<p class="hint">Tap cards to discard after seeing the flop. Then deal the turn.</p>`;
+    html+=renderHands(true);
+    html+=`<button class="btn-gold" onclick="dealTurn()">Deal Turn</button>`;
+  } else if(G.pokerPhase==='turn'){
+    html+=renderHands(false);
+    html+=`<button class="btn-gold" onclick="dealRiver()">Deal River</button>`;
+  } else if(G.pokerPhase==='river'){
+    html+=renderHands(false);
+    html+=`<button class="btn-gold" onclick="doShowdown()">Showdown 🂡</button>`;
+  } else if(G.pokerPhase==='showdown'){renderWinner();return;}
+
+  document.getElementById('poker-scroll').innerHTML=html;save();
 }
 
-function nextHole() {
-  if (G.hole < G.holes) { G.hole++; renderRound(); }
-  else goPoker();
-}
-function prevHole() {
-  if (G.hole > 1) { G.hole--; renderRound(); }
-}
-function goPoker() {
-  G.pokerPhase = 'preflop';
-  G.discarded = [[],[],[],[]];
-  G.community = [];
-  renderPoker();
-  showScreen('poker');
-}
-
-function confirmReset() {
-  if (confirm('Reset game and go back to setup?')) {
-    localStorage.removeItem('cg_state');
-    initG();
-    showScreen('setup');
-  }
-}
-
-// ---- POKER ----
-function renderPoker() {
-  const phases = ['preflop','flop','discarding','turn','river','showdown'];
-  const labels = ['Pre-flop','Flop','Discard','Turn','River','Showdown'];
-  const pi = phases.indexOf(G.pokerPhase);
-
-  let html = '';
-
-  // Phase steps
-  html += `<div class="phase-steps">`;
-  ['Flop','Discard','Turn','River','Showdown'].forEach((l,i) => {
-    const stepPhases = ['flop','discarding','turn','river','showdown'];
-    const sp = phases.indexOf(stepPhases[i]);
-    const cls = sp < pi ? 'done' : sp === pi ? 'active' : '';
-    html += `<div class="phase-step ${cls}">${l}</div>`;
-  });
-  html += `</div>`;
-
-  // Pot
-  html += `<div class="pot-header" style="margin-bottom:16px;">
-    <div class="pot-section"><div class="pot-lbl">Pot</div><div class="pot-val">${fmt(G.pot)}</div></div>
-  </div>`;
-
-  // Community cards
-  html += `<div class="card-title" style="margin-bottom:10px;">Community cards</div>`;
-  html += `<div class="hand-row" style="margin-bottom:16px;">`;
-  const shown = {preflop:0,flop:3,discarding:3,turn:4,river:5,showdown:5}[G.pokerPhase]||0;
-  if (!G.community.length && shown > 0) {
-    G.community = [draw(),draw(),draw(),draw(),draw()];
-    saveState();
-  }
-  for (let i=0;i<5;i++) {
-    if (i<shown && G.community[i]) {
-      const c = G.community[i];
-      html += `<div class="playing-card community ${RED.has(c.s)?'red':'black'}"><span>${c.r}</span><span style="font-size:12px;">${c.s}</span></div>`;
-    } else {
-      const label = i<3?'F':i===3?'T':'R';
-      html += `<div class="playing-card hidden-card">${label}</div>`;
-    }
-  }
-  html += `</div>`;
-
-  html += `<div class="sep"></div>`;
-
-  // Player hands
-  if (G.pokerPhase === 'preflop') {
-    html += `<p class="hint">Deal the flop when everyone is ready.</p>`;
-    html += `<button class="btn btn-primary" onclick="dealFlop()">Deal flop</button>`;
-  } else if (G.pokerPhase === 'flop') {
-    html += `<p class="hint">Tap cards to discard after seeing the flop. Then deal the turn.</p>`;
-    html += renderHands(true);
-    html += `<button class="btn btn-primary" onclick="dealTurn()">Deal turn</button>`;
-  } else if (G.pokerPhase === 'turn') {
-    html += renderHands(false);
-    html += `<button class="btn btn-primary" onclick="dealRiver()">Deal river</button>`;
-  } else if (G.pokerPhase === 'river') {
-    html += renderHands(false);
-    html += `<button class="btn btn-green" onclick="doShowdown()">Showdown 🂡</button>`;
-  } else if (G.pokerPhase === 'showdown') {
-    html += renderShowdown();
-  }
-
-  document.getElementById('poker-scroll').innerHTML = html;
-  saveState();
-}
-
-function renderHands(discardable) {
-  return G.players.map((name,pi) => {
-    const cards = G.hands[pi].map((c,ci) => {
-      const disc = G.discarded[pi].includes(ci);
-      const clickable = discardable ? `onclick="toggleDiscard(${pi},${ci})"` : '';
-      return `<div class="playing-card ${RED.has(c.s)?'red':'black'} ${disc?'discarded':''}" ${clickable}>
-        <span>${c.r}</span><span style="font-size:12px;">${c.s}</span>
-      </div>`;
+function renderHands(discardable){
+  return G.players.map((name,pi)=>{
+    const dc=G.discarded[pi].length;
+    const cards=G.hands[pi].map((c,ci)=>{
+      const disc=G.discarded[pi].includes(ci);
+      const click=discardable?`onclick="toggleDiscard(${pi},${ci})"`:' ';
+      return`<div class="pc ${RED.has(c.s)?'red':'black'} ${disc?'disc':''} ${!discardable?'comm':''}" ${click}><span class="rk">${c.r}</span><span class="st">${c.s}</span></div>`;
     }).join('');
-    const discCount = G.discarded[pi].length;
-    return `<div style="margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <span style="font-size:15px;font-weight:600;">${name}</span>
-        ${discardable && discCount>0 ? `<span class="badge badge-red">${discCount} discarded</span>` : ''}
-      </div>
-      <div class="hand-row">${cards}</div>
-    </div>`;
-  }).join('<div class="sep"></div>');
-}
-
-function toggleDiscard(pi, ci) {
-  const idx = G.discarded[pi].indexOf(ci);
-  if (idx===-1) G.discarded[pi].push(ci);
-  else G.discarded[pi].splice(idx,1);
-  renderPoker();
-}
-
-function dealFlop() {
-  if (!G.community.length) G.community = [draw(),draw(),draw(),draw(),draw()];
-  G.pokerPhase = 'flop';
-  renderPoker();
-}
-function dealTurn() { G.pokerPhase = 'turn'; renderPoker(); }
-function dealRiver() { G.pokerPhase = 'river'; renderPoker(); }
-function doShowdown() { G.pokerPhase = 'showdown'; renderPoker(); }
-
-function renderShowdown() {
-  const community = G.community.slice(0,5);
-  const results = G.players.map((name,pi) => {
-    const kept = G.hands[pi].filter((_,ci)=>!G.discarded[pi].includes(ci));
-    const all = [...kept, ...community];
-    const best = bestHand(all);
-    return { name, pi, kept, best };
-  }).sort((a,b) => compareHands(b.best,a.best));
-
-  const winner = results[0];
-  let html = `<div class="winner-card">
-    <div style="font-size:12px;color:var(--green);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Winner</div>
-    <div class="winner-name">${winner.name}</div>
-    <div class="winner-sub">${winner.best.name} · Takes ${fmt(G.pot)}</div>
-  </div>`;
-
-  html += results.map((r,rank) => {
-    const isWin = rank===0;
-    const cards = r.kept.map(c=>`<div class="playing-card ${RED.has(c.s)?'red':'black'}">
-      <span>${c.r}</span><span style="font-size:12px;">${c.s}</span>
-    </div>`).join('');
-    return `<div class="${isWin?'winner-card':'card'}" style="${isWin?'':'margin-bottom:10px;'}">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-size:15px;font-weight:600;">${r.name}</span>
-        <span class="badge ${isWin?'badge-green':'badge-amber'}">${r.best.name}</span>
-      </div>
-      <div class="hand-row">${cards}</div>
-    </div>`;
+    return`<div class="sep"></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;">${name}</span>${discardable&&dc>0?`<span class="badge badge-r">${dc} discarded</span>`:''}</div><div class="hand-row">${cards}</div>`;
   }).join('');
-
-  html += `<div class="sep"></div><button class="btn btn-secondary" onclick="confirmReset()">New game</button>`;
-  return html;
 }
 
-// ---- HAND EVALUATOR ----
-function bestHand(cards) {
-  if (!cards.length) return {name:'No cards',tier:-1,vals:[]};
-  const combos = cards.length >= 5 ? choose5(cards) : [cards];
-  let best = null;
-  for (const c of combos) {
-    const h = evalHand(c);
-    if (!best || compareHands(h,best)>0) best=h;
-  }
-  return best;
+function toggleDiscard(pi,ci){const idx=G.discarded[pi].indexOf(ci);if(idx===-1)G.discarded[pi].push(ci);else G.discarded[pi].splice(idx,1);renderPoker();}
+function dealFlop(){if(!G.community.length)G.community=[draw(),draw(),draw(),draw(),draw()];G.pokerPhase='flop';renderPoker();}
+function dealTurn(){G.pokerPhase='turn';renderPoker();}
+function dealRiver(){G.pokerPhase='river';renderPoker();}
+function doShowdown(){G.pokerPhase='showdown';renderPoker();}
+
+function renderWinner(){
+  const comm=G.community.slice(0,5);
+  const results=G.players.map((name,pi)=>{
+    const kept=G.hands[pi].filter((_,ci)=>!G.discarded[pi].includes(ci));
+    return{name,pi,kept,best:bestHand([...kept,...comm])};
+  }).sort((a,b)=>compareHands(b.best,a.best));
+  const w=results[0];
+  let html=`<div class="trophy-wrap"><div class="trophy-glow"></div><span class="ms fill" style="font-size:90px;color:var(--primary);">trophy</span></div>`;
+  html+=`<div style="text-align:center;margin-bottom:8px;"><div style="font-size:11px;color:var(--primary);letter-spacing:0.2em;text-transform:uppercase;font-weight:700;font-family:'Manrope',sans-serif;margin-bottom:5px;">Winner</div><div class="win-name">${w.name.toUpperCase()}</div></div>`;
+  html+=`<div style="text-align:center;margin-bottom:22px;"><span class="badge badge-g"><span class="ms fill" style="font-size:14px;">casino</span>${w.best.name} · ${fmt(G.pot)}</span></div>`;
+  html+=`<div class="sec-lbl">Final Standings</div>`;
+  html+=results.map((r,rank)=>{
+    const isWin=rank===0;
+    const minis=r.kept.slice(0,4).map(c=>`<span class="mini-c ${RED.has(c.s)?'red':'black'}">${c.r}${c.s}</span>`).join('');
+    return`<div class="lb-row ${isWin?'win':''}"><div class="rank-circ ${isWin?'first':''}">${rank+1}</div><div style="flex:1;min-width:0;"><div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.name}</div><div style="font-size:11px;color:var(--on-surface-dim);margin-top:2px;">${r.best.name}</div></div><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;">${minis}</div></div>`;
+  }).join('');
+  html+=`<div class="sep"></div><button class="btn-gold" onclick="confirmReset()">New Game</button><button class="btn-outline" onclick="showScreen('poker')">← Back to Poker</button>`;
+  document.getElementById('winner-scroll').innerHTML=html;
+  showScreen('winner');save();
 }
 
-function choose5(arr) {
-  const result=[];
-  function go(start,chosen) {
-    if (chosen.length===5){result.push([...chosen]);return;}
-    if (arr.length-start+chosen.length<5) return;
-    go(start+1,[...chosen,arr[start]]);
-    go(start+1,chosen);
-  }
-  go(0,[]);
-  return result;
-}
-
-function evalHand(cards) {
-  const vals = cards.map(c=>RANK_VAL[c.r]).sort((a,b)=>b-a);
-  const suits = cards.map(c=>c.s);
-  const counts={};
-  vals.forEach(v=>counts[v]=(counts[v]||0)+1);
-  const groups=Object.values(counts).sort((a,b)=>b-a);
-  const isFlush = cards.length>=5 && new Set(suits).size===1;
-  const isStraight = checkStraight(vals);
+// Hand evaluator
+function bestHand(cards){if(!cards.length)return{name:'No cards',tier:-1,vals:[]};const combos=cards.length>=5?choose5(cards):[cards];let best=null;for(const c of combos){const h=evalHand(c);if(!best||compareHands(h,best)>0)best=h;}return best;}
+function choose5(arr){const res=[];function go(s,ch){if(ch.length===5){res.push([...ch]);return;}if(arr.length-s+ch.length<5)return;go(s+1,[...ch,arr[s]]);go(s+1,ch);}go(0,[]);return res;}
+function evalHand(cards){
+  const vals=cards.map(c=>RV[c.r]).sort((a,b)=>b-a);
+  const suits=cards.map(c=>c.s);
+  const cnt={};vals.forEach(v=>cnt[v]=(cnt[v]||0)+1);
+  const g=Object.values(cnt).sort((a,b)=>b-a);
+  const fl=cards.length>=5&&new Set(suits).size===1;
+  const st=chkSt(vals);
   let tier,name;
-  if (isFlush&&isStraight&&vals[0]===14){tier=9;name='Royal flush';}
-  else if (isFlush&&isStraight){tier=8;name='Straight flush';}
-  else if (groups[0]===4){tier=7;name='Four of a kind';}
-  else if (groups[0]===3&&groups[1]===2){tier=6;name='Full house';}
-  else if (isFlush){tier=5;name='Flush';}
-  else if (isStraight){tier=4;name='Straight';}
-  else if (groups[0]===3){tier=3;name='Three of a kind';}
-  else if (groups[0]===2&&groups[1]===2){tier=2;name='Two pair';}
-  else if (groups[0]===2){tier=1;name='One pair';}
-  else{tier=0;name='High card';}
-  return {name,tier,vals};
+  if(fl&&st&&vals[0]===14){tier=9;name='Royal Flush';}
+  else if(fl&&st){tier=8;name='Straight Flush';}
+  else if(g[0]===4){tier=7;name='Four of a Kind';}
+  else if(g[0]===3&&g[1]===2){tier=6;name='Full House';}
+  else if(fl){tier=5;name='Flush';}
+  else if(st){tier=4;name='Straight';}
+  else if(g[0]===3){tier=3;name='Three of a Kind';}
+  else if(g[0]===2&&g[1]===2){tier=2;name='Two Pair';}
+  else if(g[0]===2){tier=1;name='One Pair';}
+  else{tier=0;name='High Card';}
+  return{name,tier,vals};
 }
+function chkSt(s){const u=[...new Set(s)];if(u.length<5)return false;if(u[0]-u[4]===4)return true;if(u.includes(14)&&u.includes(2)&&u.includes(3)&&u.includes(4)&&u.includes(5))return true;return false;}
+function compareHands(a,b){if(a.tier!==b.tier)return a.tier-b.tier;for(let i=0;i<Math.max(a.vals.length,b.vals.length);i++){const av=a.vals[i]||0,bv=b.vals[i]||0;if(av!==bv)return av-bv;}return 0;}
 
-function checkStraight(sorted) {
-  const u=[...new Set(sorted)];
-  if (u.length<5) return false;
-  if (u[0]-u[4]===4) return true;
-  if (u.includes(14)&&u.includes(2)&&u.includes(3)&&u.includes(4)&&u.includes(5)) return true;
-  return false;
-}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 
-function compareHands(a,b) {
-  if (a.tier!==b.tier) return a.tier-b.tier;
-  for (let i=0;i<Math.max(a.vals.length,b.vals.length);i++){
-    const av=a.vals[i]||0,bv=b.vals[i]||0;
-    if (av!==bv) return av-bv;
-  }
-  return 0;
-}
-
-// ---- SERVICE WORKER ----
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(()=>{});
-}
-
-// ---- INIT ----
 initG();
-if (loadState() && G.hole > 1) {
-  // Resume saved game
-  const resume = confirm('Resume your last game?');
-  if (resume) {
-    if (G.pokerPhase !== 'preflop') {
-      renderPoker(); showScreen('poker');
-    } else {
-      renderRound(); showScreen('round');
-    }
-  } else {
-    localStorage.removeItem('cg_state');
-    initG();
-  }
+if(load()&&G.hole>1){
+  if(confirm('Resume last round?')){if(G.pokerPhase!=='preflop'){renderPoker();showScreen('poker');}else{renderRound();showScreen('round');}}
+  else{localStorage.removeItem('cg3');initG();}
 }
 </script>
 </body>
